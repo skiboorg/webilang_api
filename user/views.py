@@ -118,6 +118,14 @@ class Notes(APIView):
         return Response(status=200)
 
 
+class SetTimeFormat(APIView):
+    def post(self, request):
+        print(request.data.get('format'))
+        request.user.is_time_24h = request.data.get('format')
+        request.user.save()
+        return Response(status=200)
+
+
 class LessonActivity(APIView):
     def post(self, request):
         data = request.data

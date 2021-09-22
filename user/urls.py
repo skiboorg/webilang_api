@@ -13,6 +13,7 @@ urlpatterns = [
     path('avatars', views.Avatars.as_view()),
     path('rewards', views.Rewards.as_view()),
     path('lesson_activity', views.LessonActivity.as_view()),
+    path('set_time_format', views.SetTimeFormat.as_view()),
 
 
 

@@ -1,5 +1,4 @@
 from django.db import models
-from ckeditor_uploader.fields import RichTextUploadingField
 
 
 class TariffCategory(models.Model):
@@ -44,8 +43,8 @@ class Teacher(models.Model):
     name_en = models.CharField('ФИО (англ)', max_length=50, null=True, blank=True)
     lang = models.CharField('Язык', max_length=50, null=True, blank=True)
     lang_en = models.CharField('Язык (англ)', max_length=50, null=True, blank=True)
-    text = RichTextUploadingField('Текст', blank=True, null=True)
-    text_en = RichTextUploadingField('Текст (англ)', blank=True, null=True)
+    text = models.TextField('Текст', blank=True, null=True)
+    text_en = models.TextField('Текст (англ)', blank=True, null=True)
 
     def __str__(self):
         return f'{self.name}'
@@ -66,10 +65,10 @@ class Feedback(models.Model):
     kid_image = models.ImageField('Ребенок аватар', upload_to='images/', blank=True)
     kid_info = models.CharField('Ребенок описание', max_length=50, null=True, blank=True)
     kid_info_en = models.CharField('Ребенок описание (англ)', max_length=50, null=True, blank=True)
-    parent_text = RichTextUploadingField('Родитель текст', blank=True, null=True)
-    parent_text_en = RichTextUploadingField('Родитель текст (англ)', blank=True, null=True)
-    kid_text = RichTextUploadingField('Ребенок текст )', blank=True, null=True)
-    kid_text_en = RichTextUploadingField('Ребенок текст (англ)', blank=True, null=True)
+    parent_text = models.TextField('Родитель текст', blank=True, null=True)
+    parent_text_en = models.TextField('Родитель текст (англ)', blank=True, null=True)
+    kid_text = models.TextField('Ребенок текст )', blank=True, null=True)
+    kid_text_en = models.TextField('Ребенок текст (англ)', blank=True, null=True)
 
     def __str__(self):
         return f'{self.parent}'

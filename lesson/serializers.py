@@ -11,11 +11,8 @@ class FileSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def get_filename(self, obj):
-        print(obj)
-        try:
-            return obj.url
-        except:
-            print('fileserializer error')
+
+        return obj.file.url.split('/')[4]
 
 
 class FolderSerializer(serializers.ModelSerializer):

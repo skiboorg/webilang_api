@@ -8,6 +8,15 @@ from .serializers import *
 from .models import *
 from django.core.files.base import ContentFile
 
+class GetFolders(generics.ListAPIView):
+    serializer_class = FolderSerializer
+    queryset = Folder.objects.all()
+
+class GetFiles(generics.ListAPIView):
+    serializer_class = FileSerializer
+    queryset = File.objects.all()
+
+
 class GetLesson(generics.RetrieveAPIView):
     serializer_class = LessonSerializer
     queryset = Lesson.objects.filter()
