@@ -3,6 +3,10 @@ from django.contrib.auth.models import AbstractUser, BaseUserManager
 from pytils.translit import slugify
 from django.db.models.signals import post_save
 from chat.models import *
+from random import choices
+import string
+
+
 class UserManager(BaseUserManager):
     use_in_migrations = True
     def _create_user(self, email, password, **extra_fields):
@@ -114,12 +118,13 @@ class User(AbstractUser):
 def user_post_save(sender, instance, created, **kwargs):
     """Создание всех значений по-умолчанию для нового пользовыателя"""
     if created:
-        print('creating user')
         admin = User.objects.get(is_superuser=True)
         chat = Chat.objects.create(starter=admin, opponent=instance)
         chat.users.add(admin)
         chat.users.add(instance)
-        print(chat.users.all())
+        instance.promo = ''.join(choices(string.ascii_uppercase, k=6))
+        instance.save()
+
 
 
 post_save.connect(user_post_save, sender=User)
