@@ -38,6 +38,7 @@ class Group(models.Model):
                                    help_text='ДЛЯ ДОБАВЛЕНИЯ ИЛИ УДАЛЕНИЯ УЧЕНИКА К ЧАТУ ГРУППЫ, ГРУППУ НУЖНО'
                                              ' СОХРАНИТЬ 2 РАЗА',
                                    null=True, blank=True, related_name='users')
+    link = models.TextField('Ссылка по умолчанию для всех уроков группы', max_length=100, null=True, blank=True)
     login = models.CharField('Логин для ZOOM / WebEx', max_length=50, null=True, blank=True)
     password = models.CharField('Пароль для ZOOM / WebEx', max_length=50, null=True, blank=True)
 

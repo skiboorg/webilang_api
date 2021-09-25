@@ -123,6 +123,7 @@ def user_post_save(sender, instance, created, **kwargs):
         chat.users.add(admin)
         chat.users.add(instance)
         instance.promo = ''.join(choices(string.ascii_uppercase, k=6))
+        UserNotification.objects.create(user=instance,title='Добро пожаловать',text='Привет студент! Заполни инфо о себе')
         instance.save()
 
 

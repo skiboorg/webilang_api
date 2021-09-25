@@ -11,6 +11,7 @@ from .serializers import *
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 # from notification.models import Notification
+from user.models import UserNotification
 
 channel_layer = get_channel_layer()
 
@@ -128,10 +129,11 @@ class ChatAdd(APIView):
             if user != request.user:
                 if user.channel:
                     # createNotification('chat', user, 'Новое сообщение в чате', '/lk/chats', chat_id=chat.id)
+                    UserNotification.objects.create(user=user,title='Новое сообщение в чате',text='Новое сообщение в чате')
                     async_to_sync(channel_layer.send)(user.channel,
                                                       {
                                                           "type": "user.notify",
-                                                          'message': 'Новое сообщенеи в чатеr',
+                                                          'message': 'Новое сообщенеи в чате',
                                                           'event' : 'new_chat_mgs',
                                                           'chatId': chat_id
                                                       })
