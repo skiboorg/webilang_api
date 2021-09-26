@@ -58,6 +58,7 @@ class Lesson(models.Model):
     theme = models.CharField('Тема урока', max_length=50, null=True, blank=True)
     date = models.DateField('Дата', null=True, blank=True)
     time = models.TimeField('Время', null=True, blank=True)
+    datetime = models.DateTimeField('ДатаВремя', null=True, blank=True)
     old_date = models.DateField('Предыдущая дата урока', null=True, blank=True)
     old_time = models.TimeField('Предыдущее время урока', null=True, blank=True)
     link = models.TextField('Ссылка', max_length=100, null=True, blank=True)
