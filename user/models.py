@@ -55,7 +55,7 @@ class Reward(models.Model):
 
 class User(AbstractUser):
     username = None
-    avatar = models.ImageField('Фото', upload_to='user', blank=True, null=True, default='profile.svg')
+    avatar = models.ImageField('Фото', upload_to='user', blank=True, null=True, default='default.jpg')
     chosen_avatar = models.ForeignKey(Avatar, on_delete=models.SET_NULL, blank=True, null=True)
     social_avatar = models.CharField('Фото из профиля',max_length=255, blank=True, null=True,)
     firstname = models.CharField('Имя', max_length=50, blank=True, null=True, default='Иван')
@@ -86,7 +86,7 @@ class User(AbstractUser):
     verify_code = models.CharField('Код подтверждения', max_length=50, blank=True, null=True, editable=False)
     channel = models.CharField(max_length=255,blank=True,null=True, editable=False)
     selected_reward = models.IntegerField(blank=True,null=True, editable=False)
-
+    is_marked = models.BooleanField('Особая отметка', default=False)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
@@ -110,9 +110,9 @@ class User(AbstractUser):
 
     def __str__(self):
         if self.is_teacher:
-            return f'Преподаватель {self.firstname} {self.lastname}'
+            return f'Преподаватель | {self.firstname} {self.lastname}'
         else:
-            return f'{self.firstname} {self.lastname} {"АДМИН" if self.is_superuser else ""}'
+            return f'{"АДМИН | " if self.is_superuser else ""}{self.firstname} | {self.lastname} | {self.email}'
 
 
 def user_post_save(sender, instance, created, **kwargs):
@@ -123,7 +123,7 @@ def user_post_save(sender, instance, created, **kwargs):
         chat.users.add(admin)
         chat.users.add(instance)
         instance.promo = ''.join(choices(string.ascii_uppercase, k=6))
-        UserNotification.objects.create(user=instance,title='Добро пожаловать',text='Привет студент! Заполни инфо о себе')
+        UserNotification.objects.create(user=instance, is_first=True)
         instance.save()
 
 
@@ -142,6 +142,9 @@ class UserNotification(models.Model):
     title = models.CharField(max_length=50,null=True, blank=True)
     text = models.TextField(null=True, blank=True)
     is_new = models.BooleanField(default=True)
+    is_first = models.BooleanField(default=False)
+    is_chat = models.BooleanField(default=False)
+    is_pay = models.BooleanField(default=False)
     is_selected = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True, null=True)
 

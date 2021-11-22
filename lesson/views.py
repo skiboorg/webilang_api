@@ -117,6 +117,7 @@ class UpdateLesson(APIView):
         lesson = Lesson.objects.get(id=data['id'])
         lesson.theme = data['theme']
         lesson.link = data['link']
+        lesson.time = data['time']
         if data['new_date_natural'] != '':
             lesson.is_has_new_datetime = True
             lesson.old_date = lesson.date

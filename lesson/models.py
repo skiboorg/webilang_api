@@ -61,12 +61,12 @@ class Lesson(models.Model):
     datetime = models.DateTimeField('ДатаВремя', null=True, blank=True)
     old_date = models.DateField('Предыдущая дата урока', null=True, blank=True)
     old_time = models.TimeField('Предыдущее время урока', null=True, blank=True)
-    link = models.TextField('Ссылка', max_length=100, null=True, blank=True)
+    link = models.TextField('Ссылка', null=True, blank=True)
     homeWork = models.ManyToManyField(File, blank=True, verbose_name='Домашка', related_name='home_work')
     material = models.ManyToManyField(File, blank=True, verbose_name='Материалы', related_name='material')
     is_has_new_datetime = models.BooleanField('Урок перенесен ?', default=False)
     is_over = models.BooleanField('Урок завершен ?', default=False)
-    comment = models.TextField('Комментарий', blank=True, null=True)
+    comment = models.TextField('Комментарий', default='')
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

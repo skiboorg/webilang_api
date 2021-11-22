@@ -81,6 +81,7 @@ class UserSerializer(serializers.ModelSerializer):
             'about',
             'email',
             'country',
+            'phone',
             'city',
             'birthday',
             'total_progress',

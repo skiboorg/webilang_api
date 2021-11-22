@@ -156,7 +156,9 @@ class Notifications(APIView):
         print(request.data)
         action = request.data.get('action')
         if action == 'set_read':
-            UserNotification.objects.filter(user=request.user).update(is_new=False)
+            UserNotification.objects.filter(user=request.user, is_chat=False).update(is_new=False)
+        if action == 'set_read_chat':
+            UserNotification.objects.filter(user=request.user, is_chat=True).update(is_new=False)
         if action == 'delete':
             UserNotification.objects.filter(id__in=request.data.get('ids')).delete()
         return Response(status=200)
