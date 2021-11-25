@@ -53,10 +53,20 @@ class Reward(models.Model):
         verbose_name = "Награда"
         verbose_name_plural = "Награды"
 
+
+class PromoCode(models.Model):
+    code = models.CharField('Промо-код', max_length=10, blank=True, null=True)
+    discount_percent = models.IntegerField('Скидка %', default=0)
+    discount_money_rub = models.IntegerField('Скидка руб', default=0)
+    discount_money_usd = models.IntegerField('Скидка usd', default=0)
+    free_lessons_count = models.IntegerField('Кол-во бесплатных занятий', default=0)
+    is_free_lessons = models.BooleanField('Бесплатные занятия', default=False)
+
 class User(AbstractUser):
     username = None
     avatar = models.ImageField('Фото', upload_to='user', blank=True, null=True, default='default.jpg')
     chosen_avatar = models.ForeignKey(Avatar, on_delete=models.SET_NULL, blank=True, null=True)
+    promo = models.ForeignKey(PromoCode, on_delete=models.SET_NULL, blank=True, null=True)
     social_avatar = models.CharField('Фото из профиля',max_length=255, blank=True, null=True,)
     firstname = models.CharField('Имя', max_length=50, blank=True, null=True, default='Иван')
     firstname_slug = models.CharField('Имя транслит', max_length=50, blank=True, null=True, default='Иван')
@@ -76,7 +86,7 @@ class User(AbstractUser):
 
     last_online = models.DateTimeField('Последний раз был онлайн', auto_now=True, null=True)
     is_online = models.BooleanField('Онлайн?', default=False, editable=False)
-    promo = models.CharField('Промо-код', max_length=10, blank=True, null=True)
+
     is_teacher = models.BooleanField('Это учитель?', default=False)
     is_time_24h = models.BooleanField('Время в формате 24', default=True)
 
@@ -115,6 +125,7 @@ class User(AbstractUser):
             return f'{"АДМИН | " if self.is_superuser else ""}{self.firstname} | {self.lastname} | {self.email}'
 
 
+
 def user_post_save(sender, instance, created, **kwargs):
     """Создание всех значений по-умолчанию для нового пользовыателя"""
     if created:
@@ -122,13 +133,16 @@ def user_post_save(sender, instance, created, **kwargs):
         chat = Chat.objects.create(starter=admin, opponent=instance)
         chat.users.add(admin)
         chat.users.add(instance)
-        instance.promo = ''.join(choices(string.ascii_uppercase, k=6))
+        code = ''.join(choices(string.ascii_uppercase, k=6))
+        promo_code = PromoCode.objects.create(code=code, free_lessons_count=2, is_free_lessons=True)
+        instance.promo = promo_code
         UserNotification.objects.create(user=instance, is_first=True)
-        instance.save()
+        instance.save(update_fields=['promo'])
 
 
 
 post_save.connect(user_post_save, sender=User)
+
 
 
 class UserReward(models.Model):
@@ -140,7 +154,9 @@ class UserReward(models.Model):
 class UserNotification(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='notifications')
     title = models.CharField(max_length=50,null=True, blank=True)
+    title_en = models.CharField(max_length=50,null=True, blank=True)
     text = models.TextField(null=True, blank=True)
+    text_en = models.TextField(null=True, blank=True)
     is_new = models.BooleanField(default=True)
     is_first = models.BooleanField(default=False)
     is_chat = models.BooleanField(default=False)
@@ -168,3 +184,21 @@ class Note(models.Model):
 
     class Meta:
         ordering = ('-id',)
+
+
+class Payment(models.Model):
+    sber_id = models.CharField(max_length=255,blank=True,null=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    tariff = models.ForeignKey('data.Tariff', on_delete=models.CASCADE, null=True, blank=True)
+    amount = models.CharField('Сумма', max_length=10,blank=True,null=True)
+    is_pay = models.BooleanField('Оплачено', default=False)
+    promo_code = models.CharField('Использованный промо-код', max_length=10,blank=True,null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'{self.id} | {self.created_at} | Оплата тарифа {self.tariff.id} пользователем {self.user.email}'
+
+    class Meta:
+        ordering = ('-created_at',)
+        verbose_name = "Оплата"
+        verbose_name_plural = "Оплаты"

@@ -1,4 +1,6 @@
 import json
+
+from django.http import HttpResponseRedirect
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from .services import create_random_string
@@ -6,6 +8,11 @@ from .serializers import *
 from .models import *
 from lesson.models import LessonPresence
 from rest_framework import generics
+import requests
+import settings
+from random import choices
+import string
+from django.views.decorators.clickjacking import xframe_options_exempt
 
 
 class UserUpdate(APIView):
@@ -171,3 +178,111 @@ class Avatars(generics.ListAPIView):
 class Rewards(generics.ListAPIView):
     serializer_class = RewardSerializer
     queryset = Reward.objects.all()
+
+class CheckPromo(APIView):
+    def post(self,request):
+        print(request.data)
+        promo_code = PromoCode.objects.filter(code=request.data.get('code'))
+        if promo_code.first():
+            serializer = PromoCodeSerializer(promo_code.first())
+            return Response(serializer.data,status=200)
+        else:
+            return Response( status=200)
+
+@xframe_options_exempt
+def sber_payment_complete(request):
+    print(request.GET)
+    sber_id = request.GET.get('orderId')
+    payment = Payment.objects.get(sber_id=sber_id)
+    if not payment.is_pay:
+        payment.is_pay = True
+        payment.save()
+        tariff = payment.tariff
+        user = payment.user
+
+        if tariff.is_personal:
+            user.personal_lessons_left += tariff.lessons_count
+        else:
+            user.group_lessons_left += tariff.lessons_count
+
+        if payment.promo_code:
+            promo = PromoCode.objects.get(code=payment.promo_code)
+
+            if promo.is_free_lessons:
+                if tariff.is_personal:
+                    user.personal_lessons_left += promo.free_lessons_count
+                else:
+                    user.group_lessons_left += promo.free_lessons_count
+
+                user_who_has_promo = User.objects.get(promo=promo)
+                if user_who_has_promo.personal_lessons_left > 0:
+                    user_who_has_promo.personal_lessons_left += promo.free_lessons_count
+                elif user_who_has_promo.group_lessons_left > 0:
+                    user_who_has_promo.group_lessons_left += promo.free_lessons_count
+                else:
+                    user_who_has_promo.personal_lessons_left += promo.free_lessons_count
+
+                user_who_has_promo.save(update_fields=['personal_lessons_left','group_lessons_left'])
+
+        UserNotification.objects.create(user=user,
+                                        title='Оплата',
+                                        title_en='Payment',
+                                        text='Ваш платеж поступил',
+                                        text_en='Payment success'
+                                        )
+        user.save(update_fields=['personal_lessons_left', 'group_lessons_left'])
+        return HttpResponseRedirect(f'{settings.RETURN_URL}/student/payment_complete')
+
+
+class SberPaymentCallback(APIView):
+    def post(self,request):
+        print('post')
+        data = request.data
+        print(data)
+        return Response(status=200)
+    def get(self,request):
+        print('get')
+        print(self.request.query_params)
+        print(self.request)
+        return Response(status=200)
+
+class SberPayment(APIView):
+    def post(self,request):
+        data = request.data
+        print(data)
+        orderNumber = "".join(choices(string.ascii_uppercase, k=6))
+        if data.get("language") == 'ru':
+            language = 'ru'
+            sign = 'руб'
+            description = f'Оплата за обучение  {request.user.email}'
+        else:
+            language = 'en'
+            sign = '$'
+            description = f'Payment  {request.user.email}'
+        response = requests.get(f'https://3dsec.sberbank.ru/payment/rest/register.do?'
+                                f'amount={data.get("amount")}&'
+                                f'currency={data.get("currency")}&'
+                                f'language={language}&'
+                                f'orderNumber={orderNumber}&'
+                                f'description={description}&'
+                                f'dynamicCallbackUrl={settings.SBER_API_CALLBACK_URL}&'
+                                f'password={settings.SBER_API_PASSWORD}&'
+                                f'userName={settings.SBER_API_LOGIN}&'
+                                f'returnUrl={settings.SBER_API_RETURN_URL}&'
+                                f'failUrl={settings.SBER_API_FAIL_URL}&'
+                                'pageView=DESKTOP&sessionTimeoutSecs=1200')
+        response_data = json.loads(response.content)
+
+        print(response_data)
+        if response_data.get('errorCode'):
+            result = {'success': False, 'message': response_data.get('errorMessage')}
+        else:
+            Payment.objects.create(sber_id=response_data.get('orderId'),
+                                   user=request.user,
+                                   tariff_id=data.get("tariff_id"),
+                                   amount=f'{int(data.get("amount")) / 100} {sign}',
+                                   promo_code=data.get("promo_code")
+                                   )
+            result = {'success': True, 'url': response_data.get('formUrl')}
+
+        return Response(result, status=200)

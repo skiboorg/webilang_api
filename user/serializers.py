@@ -63,11 +63,19 @@ class FolderSerializer(serializers.ModelSerializer):
         model = Folder
         fields = '__all__'
 
+
+class PromoCodeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PromoCode
+        fields = '__all__'
+
+
 class UserSerializer(serializers.ModelSerializer):
     user_avatar = serializers.SerializerMethodField()
     rewards = UserRewardSerializer(many=True,required=False,read_only=True)
     files = FileSerializer(many=True,required=False,read_only=True)
     folders = FolderSerializer(many=True,required=False,read_only=True)
+    promo = PromoCodeSerializer(many=False,required=False,read_only=True)
 
     class Meta:
         model = User

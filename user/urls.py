@@ -14,6 +14,10 @@ urlpatterns = [
     path('rewards', views.Rewards.as_view()),
     path('lesson_activity', views.LessonActivity.as_view()),
     path('set_time_format', views.SetTimeFormat.as_view()),
+    path('check_promo', views.CheckPromo.as_view()),
+    path('sber_payment', views.SberPayment.as_view()),
+    path('sber_payment_complete', views.sber_payment_complete),
+    path('payment_callback', views.SberPaymentCallback.as_view()),
 
 
 
