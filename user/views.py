@@ -33,11 +33,13 @@ class UserUpdate(APIView):
             serializer.save()
             for f in request.FILES.getlist('avatar'):
                 user.avatar = f
-                user.save(force_update=True)
+                user.chosen_avatar = None
+                user.save(update_fields=['avatar','chosen_avatar'])
             if selected_avatar:
                 ava = Avatar.objects.get(id=selected_avatar)
+                user.avatar = None
                 user.chosen_avatar=ava
-                user.save(force_update=True)
+                user.save(update_fields=['avatar', 'chosen_avatar'])
             return Response(status=200)
         else:
             print(serializer.errors)
