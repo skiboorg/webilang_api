@@ -15,6 +15,7 @@ urlpatterns = [
     path('save_lesson_files', views.SaveLessonFiles.as_view()),
     path('folders', views.GetFolders.as_view()),
     path('files', views.GetFiles.as_view()),
+    path('delete_folder', views.DeleteFolder.as_view()),
 
 
 

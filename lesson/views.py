@@ -39,6 +39,12 @@ class GetLessonPresence(generics.ListAPIView):
         return LessonPresence.objects.filter(lesson_id=self.request.query_params.get('l_id'))
 
 
+class DeleteFolder(APIView):
+    def post(self, request):
+        Folder.objects.get(id=request.data.get('id')).delete()
+        return Response(status=200)
+
+
 class DeleteFile(APIView):
     def post(self, request):
         print(request.data)
