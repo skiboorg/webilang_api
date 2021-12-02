@@ -1,0 +1,339 @@
+/---------------/
+npm install @capacitor/push-notifications
+cd src-capacitor/
+npx cap sync
+
+/---------------/
+icongenie generate --skip-trim --padding 20,20 -m cordova -i logo1.png -b bg.png 
+keytool -genkey -v -keystore my-release-key.keystore -alias alias_name -keyalg RSA -keysize 2048 -validity 20000
+
+
+quasar build -m capacitor -T android
+jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore my-release-key.keystore dist/capacitor/android/apk/release/app-release-unsigned.apk alias_name
+zipalign -v 4 dist/capacitor/android/apk/release/app-release-unsigned.apk  test-courier.apk
+
+https://rt.pornhub.com/model/bdsmlovers91/videos?page=2
+<template>
+   <web-view
+        :source="{uri:'https://www.pandiga.ru'}"
+        :style="{marginTop: 20}"
+    />
+</template>
+https://rt.pornhub.com/pornstar/savannah-camgirl/videos
+eroteric.com
+http://eroticashot.com/members
+<script>
+import { WebView } from "react-native-webview";
+export default {
+    components: {
+      'web-view': WebView
+    },
+};
+</script>
+
+4lIKxw5ASeE1SPGEbEN7hHYOktmovYpwC0c1UY9H
+
+---------------------------
+
+/-----postgresql--------/
+sudo apt install postgresql postgresql-contrib
+
+sudo -i -u postgres
+
+psql (\q выход)
+
+
+createuser --interactive
+sudo adduser test
+
+
+
+/-----postgresql--------/
+
+
+
+
+
+
+
+apt install software-properties-common
+add-apt-repository ppa:deadsnakes/ppa
+apt-get update
+
+apt install curl htop git mc python3.9 python3-pip virtualenv python3.9-distutils libpython3.9-dev snapd language-pack-ru
+
+update-locale LANG=ru_RU.UTF-8
+
+----------------------------jsssssssssssssss----------------------------
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
+source ~/.bashrc
+nvm install v12.22.1
+
+(nvm nvm ls-remote -------- list all versions)
+(nvm ls ------- list versions)
+(nvm alias default node VERSION ---- set default)
+
+npm install pm2 -g
+npm install -g @quasar/cli
+----------------------------jsssssssssssssss----------------------------
+
+virtualenv -p python3.9 venv
+source venv/bin/activate
+
+pip3 install -r requirements.txt
+pip3 install gunicorn
+nano /etc/systemd/system/gunicorn.service
+-----------------
+[Unit]
+Description=gunicorn daemon
+After=network.target
+
+[Service]
+User=root
+Group=root
+WorkingDirectory=/root/pizza_api
+ExecStart=/root/pizza_api/venv/bin/gunicorn --access-logfile - --workers 3 --bind 0.0.0.0:8000 pizza_api.wsgi:application
+
+[Install]
+WantedBy=multi-user.target
+------------------
+systemctl start gunicorn.service
+service gunicorn status
+
+-------------------------------------
+nano /etc/systemd/system/daphne.service
+
+[Unit]
+Description=myproject Daphne Service
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/root/qrsocial_api/
+ExecStart=/root/qrsocial_api/venv/bin/daphne -b 0.0.0.0 -p 8002 qrsocial_api.asgi:application
+#edit myproject
+#If your daphne is not installed globally and is inside your #environment, enter the complete path to daphne
+#ExecStart=/home/ubuntu/myproject/env/bin/daphne -p 9001     
+#          myproject.asgi:application
+[Install]
+WantedBy=multi-user.target
+
+
+-------------------------------------
+
+
+
+-----------------------certbot-------------------------------------
+snap install core; snap refresh core
+snap install --classic certbot
+ln -s /snap/bin/certbot /usr/bin/certbot
+certbot --nginx
+-----------------------certbot-------------------------------------
+
+export PATH=$PATH:$ANDROID_SDK_ROOT/tools; PATH=$PATH:$ANDROID_SDK_ROOT/platform-tools
+
+export ANDROID_HOME="$HOME/Android/Sdk"
+
+
+src/redis-server
+
+pm2 start npm -- start
+
+
+apt-get install nginx
+nano /etc/nginx/sites-available/sitename
+rm /etc/nginx/sites-enabled/default
+ln -sf /etc/nginx/sites-available/sitename /etc/nginx/sites-enabled/sitename
+
+
+upstream channels-backend {
+ server localhost:8002;
+}
+
+server {
+    index index.html;
+    server_name pangiga.ru www.pandiga.ru;
+    client_max_body_size 32m;
+
+location / {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    	}
+
+location /api {
+        include proxy_params;
+        proxy_pass http://localhost:8000;
+    	}
+    
+location /auth {
+        include proxy_params;
+        proxy_pass http://localhost:8000;
+    	}
+    
+location /api-auth {
+        include proxy_params;
+        proxy_pass http://localhost:8000;
+    	}
+    	
+location /admin {
+        include proxy_params;
+        proxy_pass http://localhost:8000;
+    	}
+    
+location /ws/ {
+	proxy_pass http://0.0.0.0:8002;
+	proxy_http_version 1.1;
+	proxy_read_timeout 86400;
+	proxy_redirect     off;
+	proxy_set_header Upgrade $http_upgrade;
+	proxy_set_header Connection "upgrade";
+	proxy_set_header Host $host;
+	proxy_set_header X-Real-IP $remote_addr;
+	proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+	proxy_set_header X-Forwarded-Host $server_name;
+	}
+
+location /static/ {
+        root  /root/pandiga_api;
+        }
+
+location /media/ {
+	include proxy_params;
+        proxy_pass http://localhost:8000/media/;
+        }
+        
+}
+
+server {   
+    #if ($host = pandiga.ru) {
+    #    return 301 https://www.$host$request_uri;
+    #} # managed by Certbot
+
+
+    listen 80;
+    listen [::]:80;
+    server_name pangiga.ru www.pandiga.ru; 
+}
+
+wget http://download.redis.io/redis-stable.tar.gz
+tar xvzf redis-stable.tar.gz
+cd redis-stable
+make
+
+cd redis-6.0.8/
+src/redis-server --daemonize yes
+service daphne status
+service daphne start
+service gunicorn start
+
+
+
+/-----------celery------------/
+
+celery -A chades_api worker -l info
+celery -A chades_api beat -l info
+
+/-----------celery------------/
+
+
+
+aedanjustine
+annie_jamess
+radventurefrankie
+zzzbutterflyxxx
+tanyaxlove
+mistressnorma
+kinky_persefone
+maleja_ca
+agatta_lesse
+diana_tey
+meganreiner
+tokio_rios
+
+
+
+curl https://toyou.amocrm.ru/oauth2/access_token -d \
+'{"client_id":"31917fea-5401-4445-873c-8d876d38a510","client_secret":"xG2GYbLH1kXO0Zwb7kHdJUDSaXZEDJZJ0nLpKcV10LooEF7EtoPuOLMsWlcTiYuL","grant_type":"authorization_code","code":"def5020070fece6c685c31f67d234da0b049e34faa337bdaccde1f4caae227ba1b9e6ccf03173545836908fd7c844f513de521ba38a27579e484bbfe289c2b8c5f8659954ba0f712f799075f84f008a5078492f91ee81ec3d7cef132bfe4985969b7517e6f7a2c6cec43de8c02e55b6595c99de05e564fd3c8543f07d2b5b60eede5efc4e3e99766476f3daea7ba5689addff25bb32c38e44da037dff969c3232bced0112ef8531455654748709526c338f94b49ade56051546a41b5f300a856801f97d7d584565424cbc943df90d484f53455c3bdf90b769b80aa4e102171c01692377464231eb83ecb22d024b73b38f9f063d0b7f520ad5ed99fb81c2c9d53a52c657d13d098a0ae497af7c387ac65ec71702d28c750450fa9d9228212abf7785596e0b40120435db589bce60fef59addfd9c0608b437684c082f65ba2e19e26d8f910b6311e5c3279fe2ec25964df93ba4e8d968ad1fbe4f0bc6b1605143517ed2a48cb24a657e3e959ee6f2500835378496eabe524d70e10fa7eac58a304ad5de15aebbe9887703431773169fe6166f69a5308d01a01983108e698693891cfdb8c54eacb7d910ecfd50a19ad9a29f894004eab5c8d11cfb93d95ee2f0bbbd0b276","redirect_uri":"https://sweet-dreams.by/"}' \
+-H 'Content-Type:application/json' \
+
+
+<script>(function(w, c){(w[c]=w[c]||[]).push(function(){new zTracker({"id":"<% if (ctx.mode.ssr) { %>{{ call_tracker_id }}<% } %>",
+  "metrics":{"metrika":"<% if (ctx.mode.ssr) { %>{{ metrika_id }}<% }%>","ga":"674-111-9147"}});});})(window, "zTrackerCallbacks");
+</script>
+<script async id="zd_ct_phone_script" src="https://my.zadarma.com/js/ct_phone.min.js"></script>
+-X POST
+
+
+
+asgard zloytal5@mail.ru
+fenir - 
+
+
+
+
+
+
+
+
+
+
+
+
+https://openapi.alipay.com/gateway.do?timestamp=2013-01-01 08:08:08&method=alipay.trade.page.pay&app_id=2021002136604704&sign_type=RSA2&sign=ERITJKEIJKJHKKKKKKKHJEREEEEEEEEEEE&version=1.0&charset=utf-8&biz_content={
+"out_trade_no":"123",
+"product_code":"FAST_INSTANT_TRADE_PAY",
+"total_amount":1.00,
+"subject":"Tarif1",        
+"passback_params":"merchantBizType%3d3C%26merchantBizNo%3d2016010101111",
+"promo_params":"{\"storeIdType\":\"1\"}",
+"merchant_order_no":"123",
+"qr_pay_mode":"4",
+"qrcode_width":200,
+"request_from_url":"https://",
+}
+
+
+
+-----------------
+Bondage & Spanking, 1920s-1950s | 126 photos
+https://deltaofvenus.com/trial/content/upload/images/1920-1950/1920-50s-bdsm/photos/1920-50s-bdsm-001.jpg
+For The Love Of Spanking | 42 photos
+https://deltaofvenus.com/trial/content/upload/images/1960-1979/spanking-1/photos/dovspank-01.jpg
+Free Love Lesbians - 1960s-1970s | 126 photos
+https://deltaofvenus.com/trial/content/upload/images/1960-1979/1970s-lesbians/photos/1970s-lesbians-001.jpg
+Victorian Era Lesbians | 43 photos
+https://deltaofvenus.com/trial/content/upload/images/1800-1920/1800s-girl-girl/photos/1800s-lesbians-001.jpg
+Sapphic Lust, 1920s-1950s | 43 photos
+https://deltaofvenus.com/trial/content/upload/images/1920-1950/1920-50s-lesbians/photos/1920-50s-girl-girl-001.jpg
+"Nurse Strap-on" & Other Tales | 85 photos
+https://deltaofvenus.com/trial/content/upload/images/1960-1979/nurse-strapon-etc/photos/1970s-nsaot-001.jpg
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

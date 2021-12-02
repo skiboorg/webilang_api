@@ -64,7 +64,7 @@ class PromoCode(models.Model):
 
 class User(AbstractUser):
     username = None
-    avatar = models.ImageField('Фото', upload_to='user', blank=True, null=True, default='default.jpg')
+    avatar = models.ImageField('Фото', upload_to='user', blank=True, null=True, default='default.png')
     chosen_avatar = models.ForeignKey(Avatar, on_delete=models.SET_NULL, blank=True, null=True)
     promo = models.ForeignKey(PromoCode, on_delete=models.SET_NULL, blank=True, null=True)
     social_avatar = models.CharField('Фото из профиля',max_length=255, blank=True, null=True,)
