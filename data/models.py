@@ -30,7 +30,7 @@ class Tariff(models.Model):
 
 
     def __str__(self):
-        return f'{self.category.name} | {self.name} | {self.price_rub} rub | {self.price_usd} usd'
+        return f'{self.name} | {self.price_rub} rub | {self.price_usd} usd'
 
     class Meta:
         verbose_name = "Тариф"
