@@ -45,6 +45,7 @@ class Avatar(models.Model):
 class Reward(models.Model):
     label = models.CharField('Название', max_length=50,null=True, blank=True)
     image = models.ImageField('Изображение', upload_to='user', blank=True, null=True)
+    is_full_cource_reward = models.BooleanField('Награда за 100%', default=False)
 
     def __str__(self):
         return f'{self.label}'
@@ -151,6 +152,7 @@ class UserReward(models.Model):
     count = models.IntegerField(default=1, blank=True)
 
 
+
 class UserNotification(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='notifications')
     title = models.CharField(max_length=50,null=True, blank=True)
@@ -162,6 +164,7 @@ class UserNotification(models.Model):
     is_chat = models.BooleanField(default=False)
     is_pay = models.BooleanField(default=False)
     is_selected = models.BooleanField(default=False)
+    is_reward = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True, null=True)
 
     class Meta:

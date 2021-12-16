@@ -3,15 +3,29 @@ from rest_framework.views import APIView
 from rest_framework import generics
 from .serializers import *
 from .models import *
-
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+import settings
 class CreateCallback(generics.ListAPIView):
     def post(self, request):
+        name = request.data.get('name')
+        phone = request.data.get('phone')
+        course = request.data.get('course')
+
         Callback.objects.create(
-            name=request.data.get('name'),
-            phone=request.data.get('phone'),
-            course=request.data.get('course')
+            name=name,
+            phone=phone,
+            course=course
             )
+        msg_html = render_to_string('callback.html', {
+            'name': name,
+            'phone': phone,
+            'course': course,
+        })
+        send_mail('Форма обратной связи с сайта Webilang', None, settings.EMAIL_HOST_USER, [settings.ADMIN_EMAIL],
+                  fail_silently=False, html_message=msg_html)
         return Response(status=200)
+
 
 class Email_Subscribe(generics.ListAPIView):
     def post(self,request):

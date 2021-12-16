@@ -152,6 +152,7 @@ class LessonActivity(APIView):
                 if not created:
                     item.count += 1
                     item.save()
+                UserNotification.objects.create(user_id=user['id'], is_reward=True)
         return Response(status=200)
 
 
@@ -230,7 +231,7 @@ def sber_payment_complete(request):
                                         title='Оплата',
                                         title_en='Payment',
                                         text='Ваш платеж поступил',
-                                        text_en='Payment success'
+                                        text_en='Payment success',
                                         )
         user.save(update_fields=['personal_lessons_left', 'group_lessons_left'])
         return HttpResponseRedirect(f'{settings.RETURN_URL}/student/payment_complete')

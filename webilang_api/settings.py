@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-
+import settings
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-ofa%tpy60+)w4bz_ldq)3*x-wwig)=mp$k8(l^w!cl0z_3pw29'
 
@@ -11,6 +11,13 @@ ALLOWED_HOSTS = ['*']
 AUTH_USER_MODEL = 'user.User'
 CKEDITOR_BASEPATH = "/static/ckeditor/ckeditor/"
 CKEDITOR_UPLOAD_PATH = "uploads/"
+
+EMAIL_HOST_USER = settings.EMAIL_HOST_USER
+EMAIL_HOST_PASSWORD = settings.EMAIL_HOST_PASSWORD
+EMAIL_HOST = 'smtp.yandex.ru'
+EMAIL_PORT = 465
+EMAIL_USE_SSL = True
+DEFAULT_FROM_EMAIL = 'info@webilang.com'
 
 
 INSTALLED_APPS = [

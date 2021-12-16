@@ -6,6 +6,7 @@ from rest_framework.views import APIView
 from rest_framework import generics
 from .serializers import *
 from .models import *
+from user.models import UserReward,UserNotification, Reward
 from django.core.files.base import ContentFile
 
 class GetFolders(generics.ListAPIView):
@@ -136,13 +137,14 @@ class DeleteLesson(APIView):
         lesson_id = request.data.get('lesson_id')
         Lesson.objects.get(id=lesson_id).delete()
         return Response(status=200)
+
 class AddLesson(APIView):
     def post(self,request):
 
         lessons = request.data.get('lessons')
         link = request.data.get('link')
         group_id = request.data.get('group_id')
-        print(lessons)
+        #print(lessons)
         for lesson in lessons:
             Lesson.objects.create(
                 group_id=group_id,
@@ -153,3 +155,25 @@ class AddLesson(APIView):
             )
         return Response(status=200)
 
+class ArchiveLesson(APIView):
+    def post(self,request):
+        print(request.data)
+        lesson = Lesson.objects.get(id=request.data['id'])
+        if not lesson.is_over:
+            lesson.is_over = True
+            lesson.save()
+            for user in lesson.group.users.all():
+                if user.total_progress == 98:
+                    reward = Reward.objects.filter(is_full_cource_reward=True).first()
+                    user.total_progress = 0
+                    UserReward.objects.create(user=user,reward=reward)
+                    UserNotification.objects.create(user=user,
+                                                    title='Награда за 100%',
+                                                    title_en='Reward for 100%',
+                                                    text='Награда за 100%',
+                                                    text_en='Reward for 100%',
+                                                    )
+                else:
+                    user.total_progress += 2
+                user.save(update_fields=['total_progress'])
+        return Response(status=200)
