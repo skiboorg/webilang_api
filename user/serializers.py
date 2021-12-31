@@ -103,6 +103,7 @@ class UserSerializer(serializers.ModelSerializer):
             'rewards',
             'files',
             'folders',
+            'is_superuser',
 
         ]
 
