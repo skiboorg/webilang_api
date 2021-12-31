@@ -13,7 +13,7 @@ app.autodiscover_tasks()
 app.conf.beat_schedule = {
     'checkLessons':{
         'task':'lesson.tasks.checkLessons',
-        'schedule' : crontab(minute='*/2', )#hour=0
+        'schedule' : crontab(minute=0,hour=0 )
     },
 
 }
