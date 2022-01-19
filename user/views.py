@@ -9,11 +9,14 @@ from .models import *
 from lesson.models import LessonPresence
 from rest_framework import generics
 import requests
-import settings
+
 from random import choices
 import string
 from django.views.decorators.clickjacking import xframe_options_exempt
 
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+import settings
 
 class UserUpdate(APIView):
     permission_classes = [IsAuthenticated]
@@ -57,6 +60,8 @@ class GetUser(generics.RetrieveAPIView):
 class UserRecoverPassword(APIView):
     def post(self,request):
         user = None
+        lang = request.data['lang']
+        print(lang)
         try:
             user = User.objects.get(email=request.data['email'])
         except:
@@ -65,7 +70,19 @@ class UserRecoverPassword(APIView):
             password = create_random_string(digits=True, num=8)
             user.set_password(password)
             user.save()
-            return Response({'result': True, 'email': user.email}, status=200)
+            if lang=='ru':
+                text = f'Ваш новый пароль на сайте Webilang : {password}'
+                subject = 'Ваш новый пароль на сайте Webilang'
+            else:
+                text = f'Your new password on Webilang : {password}'
+                subject = 'Your new password on Webilang'
+            msg_html = render_to_string('notify.html', {
+                'text': text,
+            })
+            print(password)
+            send_mail(subject, None, settings.EMAIL_HOST_USER, [user.email],
+                      fail_silently=False, html_message=msg_html)
+            return Response({'result': True}, status=200)
         else:
             return Response({'result': False}, status=200)
 
