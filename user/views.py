@@ -17,6 +17,7 @@ from django.views.decorators.clickjacking import xframe_options_exempt
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 import settings
+import datetime
 
 class UserUpdate(APIView):
     permission_classes = [IsAuthenticated]
@@ -155,21 +156,33 @@ class SetTimeFormat(APIView):
 class LessonActivity(APIView):
     def post(self, request):
         data = request.data
+        print(data)
+        lesson = None
         for user in data['data']:
             if user['is_present']:
-                item, created = LessonPresence.objects.get_or_create(
+                lesson_presence, created = LessonPresence.objects.get_or_create(
                     lesson_id=data['lesson_id'],
                     user_id=user['id'])
+                lesson = lesson_presence.lesson
                 if created:
                     print('created')
             if user['selected_reward']:
-                item, created = UserReward.objects.get_or_create(
+                reward, created = UserReward.objects.get_or_create(
                     user_id=user['id'],
                     reward_id=user['selected_reward']['id'])
                 if not created:
-                    item.count += 1
-                    item.save()
-                UserNotification.objects.create(user_id=user['id'], is_reward=True)
+                    reward.count += 1
+                    reward.save()
+
+                UserNotification.objects.create(user_id=user['id'],
+                                                is_reward=True,
+                                                title='Вы получили новую награду',
+                                                title_en='You have been given an award',
+                                                text=f'Вы получили новую награду <strong>{reward.reward.label}</strong> за активность '
+                                                     f'на уроке <strong>{lesson.theme}</strong> {datetime.date.today()}',
+                                                text_en=f'You have been given an award <strong>{reward.reward.label_en}</strong> for your'
+                                                        f' performance in lesson <strong>{lesson.theme}</strong> {datetime.date.today()}'
+                                                )
         return Response(status=200)
 
 
@@ -201,17 +214,32 @@ class Rewards(generics.ListAPIView):
 
 class CheckPromo(APIView):
     def post(self,request):
-        print(request.data)
-        promo_code = PromoCode.objects.filter(code=request.data.get('code'))
-        if promo_code.first():
-            serializer = PromoCodeSerializer(promo_code.first())
-            return Response(serializer.data,status=200)
+
+        promo_code = None
+        used_promo = False
+        try:
+            promo_code = PromoCode.objects.get(code=request.data.get('code'))
+        except:
+            pass
+
+        try:
+            used_promo = UsedPromoCode.objects.get(user=request.user, promo=promo_code)
+
+        except:
+            pass
+        if not used_promo:
+            if promo_code:
+                serializer = PromoCodeSerializer(promo_code)
+                UsedPromoCode.objects.create(user=request.user, promo=promo_code)
+                return Response(serializer.data,status=200)
+            else:
+                return Response(status=200)
         else:
-            return Response( status=200)
+            return Response({'status':False,'promo_used':True},status=200)
 
 @xframe_options_exempt
 def sber_payment_complete(request):
-    print(request.GET)
+
     sber_id = request.GET.get('orderId')
     payment = Payment.objects.get(sber_id=sber_id)
     if not payment.is_pay:
@@ -269,7 +297,7 @@ class SberPaymentCallback(APIView):
 class SberPayment(APIView):
     def post(self,request):
         data = request.data
-        print(data)
+
         orderNumber = "".join(choices(string.ascii_uppercase, k=6))
         if data.get("language") == 'ru':
             language = 'ru'
@@ -293,7 +321,7 @@ class SberPayment(APIView):
                                 'pageView=DESKTOP&sessionTimeoutSecs=1200')
         response_data = json.loads(response.content)
 
-        print(response_data)
+
         if response_data.get('errorCode'):
             result = {'success': False, 'message': response_data.get('errorMessage')}
         else:

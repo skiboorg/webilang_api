@@ -7,6 +7,7 @@ from random import choices
 import string
 
 
+
 class UserManager(BaseUserManager):
     use_in_migrations = True
     def _create_user(self, email, password, **extra_fields):
@@ -44,6 +45,7 @@ class Avatar(models.Model):
 
 class Reward(models.Model):
     label = models.CharField('Название', max_length=50,null=True, blank=True)
+    label_en = models.CharField('Название англ', max_length=50,null=True, blank=True)
     image = models.ImageField('Изображение', upload_to='user', blank=True, null=True)
     is_full_cource_reward = models.BooleanField('Награда за 100%', default=False)
 
@@ -126,6 +128,9 @@ class User(AbstractUser):
             return f'{"АДМИН | " if self.is_superuser else ""}{self.firstname} | {self.lastname} | {self.email}'
 
 
+class UsedPromoCode(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='used_promos')
+    promo = models.ForeignKey(PromoCode, on_delete=models.CASCADE, null=True, blank=True)
 
 def user_post_save(sender, instance, created, **kwargs):
     """Создание всех значений по-умолчанию для нового пользовыателя"""

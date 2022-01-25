@@ -48,7 +48,7 @@ class DeleteFolder(APIView):
 
 class DeleteFile(APIView):
     def post(self, request):
-        print(request.data)
+
         fileType  = request.data.get('list')
         if fileType:
             if fileType == 'home_work':
@@ -94,8 +94,6 @@ class SaveLessonFiles(APIView):
         return Response(status=200)
 class UploadFiles(APIView):
     def post(self, request):
-        print(request.data)
-        print(request.FILES)
         folder_id = request.data.get('folder')
         print(folder_id)
         folder = None
@@ -119,7 +117,6 @@ class NewFolder(APIView):
 
 class UpdateLesson(APIView):
     def post(self, request):
-        print(request.data)
         data = request.data['data']
         lesson = Lesson.objects.get(id=data['id'])
         lesson.theme = data['theme']
@@ -157,7 +154,6 @@ class AddLesson(APIView):
 
 class ArchiveLesson(APIView):
     def post(self,request):
-        print(request.data)
         lesson = Lesson.objects.get(id=request.data['id'])
         if not lesson.is_over:
             lesson.is_over = True
@@ -168,10 +164,10 @@ class ArchiveLesson(APIView):
                     user.total_progress = 0
                     UserReward.objects.create(user=user,reward=reward)
                     UserNotification.objects.create(user=user,
-                                                    title='Награда за 100%',
-                                                    title_en='Reward for 100%',
-                                                    text='Награда за 100%',
-                                                    text_en='Reward for 100%',
+                                                    title='Поздравляем!',
+                                                    title_en='Congratulations!',
+                                                    text='Вы успешно прошли курс онлайн-школы WebiLang. Продолжайте в том же духе! :)',
+                                                    text_en='You’re successfully completed a WebiLang course. Keep up the good work! :)',
                                                     )
                 else:
                     user.total_progress += 2
