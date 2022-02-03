@@ -18,6 +18,8 @@ urlpatterns = [
     path('sber_payment', views.SberPayment.as_view()),
     path('sber_payment_complete', views.sber_payment_complete),
     path('payment_callback', views.SberPaymentCallback.as_view()),
+    path('pay_pal_payment', views.PayPalPayment.as_view()),
+    path('pay_pal_payment_complete', views.pay_pal_payment_complete),
 
 
 

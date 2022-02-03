@@ -13,3 +13,5 @@ yandex_checkout
 
 celery
 redis
+
+paypalrestsdk

@@ -196,6 +196,8 @@ class Note(models.Model):
 
 class Payment(models.Model):
     sber_id = models.CharField(max_length=255,blank=True,null=True)
+    pay_pal_id = models.CharField(max_length=255,blank=True,null=True)
+    orderNumber = models.CharField(max_length=255,blank=True,null=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     tariff = models.ForeignKey('data.Tariff', on_delete=models.CASCADE, null=True, blank=True)
     amount = models.CharField('Сумма', max_length=10,blank=True,null=True)

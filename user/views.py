@@ -19,6 +19,13 @@ from django.template.loader import render_to_string
 import settings
 import datetime
 
+import paypalrestsdk
+
+paypalrestsdk.configure({
+  "mode": "sandbox", # sandbox or live
+  "client_id": settings.PAY_PAL_CLIENT_ID,
+  "client_secret": settings.PAY_PAL_CLIENT_SECRET})
+
 class UserUpdate(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -237,11 +244,8 @@ class CheckPromo(APIView):
         else:
             return Response({'status':False,'promo_used':True},status=200)
 
-@xframe_options_exempt
-def sber_payment_complete(request):
 
-    sber_id = request.GET.get('orderId')
-    payment = Payment.objects.get(sber_id=sber_id)
+def checkPayment(payment):
     if not payment.is_pay:
         payment.is_pay = True
         payment.save()
@@ -270,7 +274,7 @@ def sber_payment_complete(request):
                 else:
                     user_who_has_promo.personal_lessons_left += promo.free_lessons_count
 
-                user_who_has_promo.save(update_fields=['personal_lessons_left','group_lessons_left'])
+                user_who_has_promo.save(update_fields=['personal_lessons_left', 'group_lessons_left'])
 
         UserNotification.objects.create(user=user,
                                         title='Оплата',
@@ -280,6 +284,12 @@ def sber_payment_complete(request):
                                         )
         user.save(update_fields=['personal_lessons_left', 'group_lessons_left'])
         return HttpResponseRedirect(f'{settings.RETURN_URL}/student/payment_complete')
+
+@xframe_options_exempt
+def sber_payment_complete(request):
+    sber_id = request.GET.get('orderId')
+    payment = Payment.objects.get(sber_id=sber_id)
+    checkPayment(payment=payment)
 
 
 class SberPaymentCallback(APIView):
@@ -293,6 +303,7 @@ class SberPaymentCallback(APIView):
         print(self.request.query_params)
         print(self.request)
         return Response(status=200)
+
 
 class SberPayment(APIView):
     def post(self,request):
@@ -329,8 +340,60 @@ class SberPayment(APIView):
                                    user=request.user,
                                    tariff_id=data.get("tariff_id"),
                                    amount=f'{int(data.get("amount")) / 100} {sign}',
-                                   promo_code=data.get("promo_code")
+                                   promo_code=data.get("promo_code"),
+                                   orderNumber=orderNumber
                                    )
             result = {'success': True, 'url': response_data.get('formUrl')}
 
         return Response(result, status=200)
+
+class PayPalPayment(APIView):
+    def post(self,request):
+        data = request.data
+        print(data)
+        orderNumber = "".join(choices(string.ascii_uppercase, k=6))
+
+        payment = paypalrestsdk.Payment({
+            "intent": "sale",
+            "payer": {
+                "payment_method": "paypal"},
+            "redirect_urls": {
+                "return_url": settings.PAY_PAL_RETURN_URL,
+                "cancel_url": "http://localhost:3000/"},
+            "transactions": [{
+                "item_list": {
+                    "items": [{
+                        "name": "Order",
+                        "sku": orderNumber,
+                        "price": data.get('amount'),
+                        "currency": "USD",
+                        "quantity": 1}]},
+                "amount": {
+                    "total": data.get('amount'),
+                    "currency": "USD"},
+                "description": f'Payment  {request.user.email}'}]})
+
+        if payment.create():
+            payment_info = payment.to_dict()
+            print(payment_info['links'][1]['href'])
+
+            Payment.objects.create(pay_pal_id=payment_info['id'],
+                                   user=request.user,
+                                   tariff_id=data.get("tariff_id"),
+                                   amount=f'{int(data.get("amount"))} USD',
+                                   promo_code=data.get("promo_code"),
+                                   orderNumber=orderNumber
+                                   )
+
+            result = {'success': True, 'url':payment_info['links'][1]['href'] }
+        else:
+            print(payment.error)
+            result = {'success': False, 'message': payment.error}
+
+        return Response(result, status=200)
+
+def pay_pal_payment_complete(request):
+    paymentId = request.GET.get('paymentId')
+    payment = Payment.objects.get(pay_pal_id=paymentId)
+    checkPayment(payment=payment)
+    return HttpResponseRedirect(f'{settings.RETURN_URL}/student/payment_complete')
