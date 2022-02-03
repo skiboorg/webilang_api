@@ -22,7 +22,7 @@ import datetime
 import paypalrestsdk
 
 paypalrestsdk.configure({
-  "mode": "sandbox", # sandbox or live
+  "mode": settings.PAY_PAL_MODE, # sandbox or live
   "client_id": settings.PAY_PAL_CLIENT_ID,
   "client_secret": settings.PAY_PAL_CLIENT_SECRET})
 
