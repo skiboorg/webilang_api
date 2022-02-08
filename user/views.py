@@ -366,11 +366,11 @@ class PayPalPayment(APIView):
                         "name": "Order",
                         "sku": orderNumber,
                         "price": data.get('amount'),
-                        "currency": "USD",
+                        "currency": "RUB",
                         "quantity": 1}]},
                 "amount": {
                     "total": data.get('amount'),
-                    "currency": "USD"},
+                    "currency": "RUB"},
                 "description": f'Payment  {request.user.email}'}]})
 
         if payment.create():
