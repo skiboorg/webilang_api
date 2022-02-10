@@ -318,7 +318,7 @@ class SberPayment(APIView):
             language = 'en'
             sign = '$'
             description = f'Payment  {request.user.email}'
-        response = requests.get(f'https://3dsec.sberbank.ru/payment/rest/register.do?'
+        response = requests.get(f'{settings.SBER_PAY_URL}'
                                 f'amount={data.get("amount")}&'
                                 f'currency=643&'
                                 f'language={language}&'
