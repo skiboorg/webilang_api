@@ -6,7 +6,8 @@ from rest_framework.permissions import IsAuthenticated
 from .services import create_random_string
 from .serializers import *
 from .models import *
-from lesson.models import LessonPresence
+
+from lesson.models import LessonPresence, Lesson
 from rest_framework import generics
 import requests
 
@@ -174,6 +175,9 @@ class LessonActivity(APIView):
                 if created:
                     print('created')
             if user['selected_reward']:
+                lesson = Lesson.objects.get(
+                    id=data['lesson_id'],
+                    )
                 reward, created = UserReward.objects.get_or_create(
                     user_id=user['id'],
                     reward_id=user['selected_reward']['id'])
@@ -282,7 +286,15 @@ def checkPayment(payment):
                                         text='Ваш платеж поступил',
                                         text_en='Payment success',
                                         )
+
         user.save(update_fields=['personal_lessons_left', 'group_lessons_left'])
+
+        msg_html = render_to_string('notify.html', {
+            'text': f'Поступила оплата от {user.email}',
+        })
+
+        send_mail('Поступила оплата', None, settings.EMAIL_HOST_USER, [settings.ADMIN_EMAIL],
+                  fail_silently=False, html_message=msg_html)
         return HttpResponseRedirect(f'{settings.RETURN_URL}/student/payment_complete')
 
 @xframe_options_exempt
@@ -331,7 +343,7 @@ class SberPayment(APIView):
                                 f'failUrl={settings.SBER_API_FAIL_URL}&'
                                 'pageView=DESKTOP&sessionTimeoutSecs=1200')
         response_data = json.loads(response.content)
-
+        print(response_data)
 
         if response_data.get('errorCode'):
             result = {'success': False, 'message': response_data.get('errorMessage')}

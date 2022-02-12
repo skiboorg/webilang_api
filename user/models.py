@@ -5,7 +5,9 @@ from django.db.models.signals import post_save
 from chat.models import *
 from random import choices
 import string
-
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+import settings
 
 
 class UserManager(BaseUserManager):
@@ -144,6 +146,12 @@ def user_post_save(sender, instance, created, **kwargs):
         instance.promo = promo_code
         UserNotification.objects.create(user=instance, is_first=True)
         instance.save(update_fields=['promo'])
+        msg_html = render_to_string('notify.html', {
+            'text': f'Зарегистрирован новый пользователь ID {instance.id} EMAIL {instance.email}',
+        })
+
+        send_mail('Зарегистрирован новый пользователь', None, settings.EMAIL_HOST_USER, [settings.ADMIN_EMAIL],
+                  fail_silently=False, html_message=msg_html)
 
 
 
