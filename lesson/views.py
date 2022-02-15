@@ -118,14 +118,18 @@ class NewFolder(APIView):
 class UpdateLesson(APIView):
     def post(self, request):
         data = request.data['data']
+        offset = request.data.get('offset')
         lesson = Lesson.objects.get(id=data['id'])
         lesson.theme = data['theme']
         lesson.link = data['link']
         lesson.time = data['time']
+        lesson.timeoffset = offset
+
         if data['new_date_natural'] != '':
             lesson.is_has_new_datetime = True
             lesson.old_date = lesson.date
             lesson.date = data['new_date_natural']
+
         lesson.save()
         return Response(status=200)
 
@@ -141,6 +145,7 @@ class AddLesson(APIView):
         lessons = request.data.get('lessons')
         link = request.data.get('link')
         group_id = request.data.get('group_id')
+        offset = request.data.get('offset')
         #print(lessons)
         for lesson in lessons:
             Lesson.objects.create(
@@ -148,6 +153,7 @@ class AddLesson(APIView):
                 theme=lesson['theme'],
                 date=lesson['date'].replace('/','-'),
                 time=lesson['time'],
+                timeoffset=offset,
                 link=link
             )
         return Response(status=200)

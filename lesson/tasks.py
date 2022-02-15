@@ -24,6 +24,9 @@ def checkLessons():
                                                     text_en='You’re successfully completed a WebiLang course. Keep up the good work! :)',
                                                     )
                 else:
+                    print('total_progress', user.total_progress)
                     user.total_progress += 2
-                user.save(update_fields=['total_progress'])
+                    print('user',user)
+                    print('total_progress',user.total_progress)
+                    user.save(update_fields=['total_progress'])
     print('checkLessons done')
