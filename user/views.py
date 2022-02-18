@@ -249,7 +249,13 @@ class CheckPromo(APIView):
             return Response({'status':False,'promo_used':True},status=200)
 
 
-def checkPayment(payment):
+
+
+@xframe_options_exempt
+def sber_payment_complete(request):
+    sber_id = request.GET.get('orderId')
+    payment = Payment.objects.get(sber_id=sber_id)
+    print(payment)
     if not payment.is_pay:
         payment.is_pay = True
         payment.save()
@@ -300,13 +306,6 @@ def checkPayment(payment):
     else:
         print('return payed')
         return HttpResponseRedirect(f'{settings.RETURN_URL}')
-
-@xframe_options_exempt
-def sber_payment_complete(request):
-    sber_id = request.GET.get('orderId')
-    payment = Payment.objects.get(sber_id=sber_id)
-    print(payment)
-    checkPayment(payment=payment)
 
 
 class SberPaymentCallback(APIView):
