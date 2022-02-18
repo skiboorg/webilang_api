@@ -295,12 +295,17 @@ def checkPayment(payment):
 
         send_mail('Поступила оплата', None, settings.EMAIL_HOST_USER, [settings.ADMIN_EMAIL],
                   fail_silently=False, html_message=msg_html)
+        print('return')
         return HttpResponseRedirect(f'{settings.RETURN_URL}/student/payment_complete')
+    else:
+        print('return payed')
+        return HttpResponseRedirect(f'{settings.RETURN_URL}')
 
 @xframe_options_exempt
 def sber_payment_complete(request):
     sber_id = request.GET.get('orderId')
     payment = Payment.objects.get(sber_id=sber_id)
+    print(payment)
     checkPayment(payment=payment)
 
 
