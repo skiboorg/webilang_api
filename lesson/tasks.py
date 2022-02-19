@@ -5,7 +5,7 @@ from .models import Lesson
 from user.models import Reward,UserReward,UserNotification
 @shared_task
 def checkLessons():
-    dt = now()
+    dt = now() - timedelta(days=1)
     start = dt.replace(hour=0, minute=0, second=0, microsecond=0)
     lessons = Lesson.objects.filter(date__lte=start)
     for lesson in lessons:
