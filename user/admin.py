@@ -8,7 +8,7 @@ class UserPaymentsyInline (admin.TabularInline):
     extra = 0
 
 class UserAdmin(BaseUserAdmin):
-    list_display = ('firstname', 'lastname', 'phone', 'email')
+    list_display = ('firstname', 'lastname', 'phone', 'email','personal_lessons_left','group_lessons_left','total_progress',)
     inlines = [UserPaymentsyInline]
     ordering = ('id',)
     add_fieldsets = (
