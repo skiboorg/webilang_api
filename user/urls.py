@@ -20,6 +20,7 @@ urlpatterns = [
     path('payment_callback', views.SberPaymentCallback.as_view()),
     path('pay_pal_payment', views.PayPalPayment.as_view()),
     path('pay_pal_payment_complete', views.pay_pal_payment_complete),
+    path('test', views.Test.as_view()),
 
 
 

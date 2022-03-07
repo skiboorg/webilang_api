@@ -296,7 +296,7 @@ def sber_payment_complete(request):
         user.save(update_fields=['personal_lessons_left', 'group_lessons_left'])
 
         msg_html = render_to_string('notify.html', {
-            'text': f'Поступила оплата от {user.email}',
+            'text': f'Поступила оплата от {user.firstname} {user.lastname} {user.email} | Сумма {payment.amount}',
         })
 
         send_mail('Поступила оплата', None, settings.EMAIL_HOST_USER, [settings.ADMIN_EMAIL],
@@ -413,3 +413,10 @@ def pay_pal_payment_complete(request):
     payment = Payment.objects.get(pay_pal_id=paymentId)
     checkPayment(payment=payment)
     return HttpResponseRedirect(f'{settings.RETURN_URL}/student/payment_complete')
+
+class Test(APIView):
+
+    def get(self,request):
+        from lesson.tasks import checkLessons
+        checkLessons()
+

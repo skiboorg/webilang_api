@@ -26,6 +26,44 @@ CELERY_SERIALIZER = 'json'
 CELERY_BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 3600}
 CELERY_BROKER_URL = 'redis://127.0.0.1:6379/0'
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'log_formatter':{
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{'
+        }
+    },
+    'handlers': {
+        'django_log': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': 'django.log',
+            'formatter': 'log_formatter'
+        },
+        'users_log': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': 'users.log',
+            'formatter': 'log_formatter'
+        },
+
+    },
+    'loggers': {
+        'django': { # <-- must have one django
+            'handlers': ['django_log'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'user': {
+            'handlers': ['users_log'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+
+    },
+}
 
 INSTALLED_APPS = [
     'channels',
@@ -72,6 +110,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'user.middleware.Process500'
 ]
 
 ROOT_URLCONF = 'webilang_api.urls'

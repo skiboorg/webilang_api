@@ -84,8 +84,8 @@ class User(AbstractUser):
     city = models.CharField('Город', max_length=20, blank=True, null=True)
 
     total_progress = models.IntegerField('Пройдено курса', default=0)
-    personal_lessons_left = models.IntegerField('Занятий осталось (индивидуальных)', default=0)
-    group_lessons_left = models.IntegerField('Занятий осталось (гупповых)', default=0)
+    personal_lessons_left = models.IntegerField('И.З.', default=0)
+    group_lessons_left = models.IntegerField('Г.З.', default=0)
 
     about = models.TextField('О себе ', blank=True, null=True)
 
