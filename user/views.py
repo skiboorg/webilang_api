@@ -327,7 +327,7 @@ class SberPaymentCallback(APIView):
 class SberPayment(APIView):
     def post(self,request):
         data = request.data
-        print(data)
+        #print(data)
         orderNumber = "".join(choices(string.ascii_uppercase, k=6))
         if data.get("language") == 'ru':
             language = 'ru'
@@ -350,7 +350,7 @@ class SberPayment(APIView):
                                 f'failUrl={settings.SBER_API_FAIL_URL}&'
                                 'pageView=DESKTOP&sessionTimeoutSecs=1200')
         response_data = json.loads(response.content)
-        print(response_data)
+        #print(response_data)
 
         if response_data.get('errorCode'):
             result = {'success': False, 'message': response_data.get('errorMessage')}
@@ -369,7 +369,7 @@ class SberPayment(APIView):
 class PayPalPayment(APIView):
     def post(self,request):
         data = request.data
-        print(data)
+        #print(data)
         orderNumber = "".join(choices(string.ascii_uppercase, k=6))
 
         payment = paypalrestsdk.Payment({
@@ -394,7 +394,7 @@ class PayPalPayment(APIView):
 
         if payment.create():
             payment_info = payment.to_dict()
-            print(payment_info['links'][1]['href'])
+            #print(payment_info['links'][1]['href'])
 
             Payment.objects.create(pay_pal_id=payment_info['id'],
                                    user=request.user,
@@ -406,7 +406,7 @@ class PayPalPayment(APIView):
 
             result = {'success': True, 'url':payment_info['links'][1]['href'] }
         else:
-            print(payment.error)
+            #print(payment.error)
             result = {'success': False, 'message': payment.error}
 
         return Response(result, status=200)
