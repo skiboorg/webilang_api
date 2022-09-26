@@ -22,7 +22,7 @@ class UserAdmin(BaseUserAdmin):
          ),
     )
     search_fields = ('email', 'firstname', 'lastname', 'phone',)
-    list_filter = ('is_teacher','is_marked',)
+    list_filter = ('is_teacher','is_marked','is_superuser',)
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
         ('Personal info',
